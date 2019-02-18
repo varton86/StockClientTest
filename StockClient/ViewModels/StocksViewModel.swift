@@ -39,15 +39,17 @@ final class StocksViewModel {
         }
         isFetchInProgress = true
         
-        client.fetchStocks() { result in
+        client.fetchStocks() { [weak self] result in
             switch result {
             case .failure(let error):
                 DispatchQueue.main.async {
+                    guard let `self` = self else { return }
                     self.isFetchInProgress = false
                     self.delegate?.onFetchFailed(with: error.reason)
                 }
             case .success(let response):
                 DispatchQueue.main.async {
+                    guard let `self` = self else { return }
                     self.isFetchInProgress = false
                     self.stocks = [Stock]()
                     self.stocks.append(contentsOf: response.stock)
